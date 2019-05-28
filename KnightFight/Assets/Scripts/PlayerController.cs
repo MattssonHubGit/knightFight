@@ -34,12 +34,16 @@ public class PlayerController : MonoBehaviour
         //FaceingController();
         MoveController();
         AttackController();
-        AnimationHandling();
 
-        if (Input.GetKeyDown(KeyCode.Keypad1))
+        /*if (Input.GetKeyDown(KeyCode.Keypad1))
         {
             CameraController.Instance.AddCamShake(shakeAmount);
-        }
+        }*/
+    }
+
+    private void LateUpdate()
+    {
+        AnimationHandling();
     }
 
     private void FaceingController()
@@ -142,11 +146,9 @@ public class PlayerController : MonoBehaviour
     private void AttackController()
     {
         //Attack on click
-        if (Input.GetMouseButtonDown(0) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.E) && isGrounded)
         {
-            canMove = false;
-            myAnim.Play("player_attack_B");
-
+            myAnim.SetTrigger("Attacking");
         }
     }
 
