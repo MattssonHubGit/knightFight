@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour
     private float horizonatalMovement;
     private float verticalMovement;
 
+    [Header("Combat")]
+    private bool canGetSecondBaseAttack = false;
+    private bool canGetThirdBaseAttack = false;
+
     [Header("Debug")]
     [SerializeField] private float shakeAmount = 1f;
 
@@ -145,11 +149,31 @@ public class PlayerController : MonoBehaviour
 
     private void AttackController()
     {
-        //Attack on click
-        if (Input.GetKeyDown(KeyCode.E) && isGrounded)
+        if (isGrounded)
         {
-            myAnim.SetTrigger("Attacking");
+            //Clicking
+            if (Input.GetMouseButtonDown(0))
+            {
+                //1st attack
+                if (myAnim.GetBool("IsComboing") == false)
+                {
+                    myAnim.SetTrigger("AttackBaseFirst");
+                }
+
+                //2nd attack 
+                if (myAnim.GetBool("IsComboing") == true && canGetSecondBaseAttack)
+                {
+                    myAnim.SetTrigger("AttackBaseSecond");
+                }
+
+                //2nd attack 
+                if (myAnim.GetBool("IsComboing") == true && canGetThirdBaseAttack)
+                {
+                    myAnim.SetTrigger("AttackBaseThird");
+                }
+            }
         }
+
     }
 
 
@@ -163,6 +187,25 @@ public class PlayerController : MonoBehaviour
     public void EnableMovement()
     {
         canMove = true;
+    }
+
+    public void EndCombo()
+    {
+        myAnim.SetBool("IsComboing", false);
+        canGetSecondBaseAttack = false;
+        canGetThirdBaseAttack = false;
+    }
+
+    public void CanGetSecondBaseAttack()
+    {
+        myAnim.SetBool("IsComboing", true);
+        canGetSecondBaseAttack = true;
+    }
+
+    public void CanGetThirdBaseAttack()
+    {
+        myAnim.SetBool("IsComboing", true);
+        canGetThirdBaseAttack = true;
     }
 
 }
