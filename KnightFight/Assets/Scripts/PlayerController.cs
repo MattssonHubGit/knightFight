@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lowJumpMultiplier = 200f;
 
     [HideInInspector] public bool isGrounded = true;
-    private bool canMove = true;
+    [SerializeField]private bool canMove = true;
     private float horizonatalMovement;
     private float verticalMovement;
 
@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             //Clicking
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 //1st attack
                 if (myAnim.GetBool("IsComboing") == false)
