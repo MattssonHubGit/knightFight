@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     private bool canGetSecondBaseAttack = false;
     private bool canGetThirdBaseAttack = false;
 
+    private bool continueingCombo = false;
+
     [Header("Debug")]
     [SerializeField] private float shakeAmount = 1f;
 
@@ -152,7 +154,7 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             //Clicking
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetMouseButtonDown(0))
             {
                 //1st attack
                 if (myAnim.GetBool("IsComboing") == false)
@@ -161,15 +163,17 @@ public class PlayerController : MonoBehaviour
                 }
 
                 //2nd attack 
-                if (myAnim.GetBool("IsComboing") == true && canGetSecondBaseAttack)
+                if (/*myAnim.GetBool("IsComboing") == true && */canGetSecondBaseAttack)
                 {
                     myAnim.SetTrigger("AttackBaseSecond");
+                    continueingCombo = true;
                 }
 
-                //2nd attack 
-                if (myAnim.GetBool("IsComboing") == true && canGetThirdBaseAttack)
+                //3rd attack 
+                if (/*myAnim.GetBool("IsComboing") == true && */canGetThirdBaseAttack)
                 {
                     myAnim.SetTrigger("AttackBaseThird");
+                    continueingCombo = true;
                 }
             }
         }
@@ -180,6 +184,8 @@ public class PlayerController : MonoBehaviour
     //Add on last keyframe of attack animations
     public void DisableMovement()
     {
+        Debug.Log("PlayerController::DisableMovement -- Event called");
+
         myRB.velocity = Vector3.zero;
         canMove = false;
     }
@@ -191,9 +197,20 @@ public class PlayerController : MonoBehaviour
 
     public void EndCombo()
     {
-        myAnim.SetBool("IsComboing", false);
-        canGetSecondBaseAttack = false;
-        canGetThirdBaseAttack = false;
+        Debug.Log("PlayerController::EndCombo() -- Event called");
+
+        if (continueingCombo == false)
+        {
+            myAnim.SetBool("IsComboing", false);
+            canGetSecondBaseAttack = false;
+            canGetThirdBaseAttack = false;
+            canMove = true;
+        }
+        else
+        {
+            continueingCombo = false;
+        }
+
     }
 
     public void CanGetSecondBaseAttack()
