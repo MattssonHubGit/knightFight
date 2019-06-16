@@ -17,10 +17,8 @@ public class PlayerController : MonoBehaviour
     private float verticalMovement;
 
     [Header("Combat")]
-    private bool canGetSecondBaseAttack = false;
-    private bool canGetThirdBaseAttack = false;
-
-    private bool continueingCombo = false;
+    bool canBaseAttack = true; //Locks ability to attack during animation
+    int amountBaseCombo = 0; //Determines animation to play
 
     [Header("Debug")]
     [SerializeField] private float shakeAmount = 1f;
@@ -156,30 +154,66 @@ public class PlayerController : MonoBehaviour
             //Clicking
             if (Input.GetMouseButtonDown(0))
             {
-                //1st attack
-                if (myAnim.GetBool("IsComboing") == false)
-                {
-                    myAnim.SetTrigger("AttackBaseFirst");
-                }
-
-                //2nd attack 
-                if (/*myAnim.GetBool("IsComboing") == true && */canGetSecondBaseAttack)
-                {
-                    myAnim.SetTrigger("AttackBaseSecond");
-                    continueingCombo = true;
-                }
-
-                //3rd attack 
-                if (/*myAnim.GetBool("IsComboing") == true && */canGetThirdBaseAttack)
-                {
-                    myAnim.SetTrigger("AttackBaseThird");
-                    continueingCombo = true;
-                }
+                BaseAttackStarter();
             }
         }
 
     }
 
+    private void BaseAttackStarter()
+    {
+        if (canBaseAttack)
+        {
+            amountBaseCombo++;
+        }
+
+        if (amountBaseCombo == 1)
+        {
+            myAnim.SetInteger("basicComboCounter", 1);
+        }
+    }
+
+    public void BaseAttackComboCheck()
+    {
+        canBaseAttack = false;
+
+        //1st attack
+        if (myAnim.GetCurrentAnimatorStateInfo(0).IsName("player_attack_B") && amountBaseCombo == 1)
+        {
+            //If the 1st animation is still playing and only 1 click has happend, return to idle
+            myAnim.SetInteger("basicComboCounter", 4);
+            canBaseAttack = true;
+            amountBaseCombo = 0;
+        }
+        else if (myAnim.GetCurrentAnimatorStateInfo(0).IsName("player_attack_B") && amountBaseCombo >= 2)
+        {
+            //If the 1st animation is still playing and at least 2 clicks has happend, continue combo
+            myAnim.SetInteger("basicComboCounter", 2);
+            canBaseAttack = true;
+        }
+        //2nd attack
+        else if (myAnim.GetCurrentAnimatorStateInfo(0).IsName("player_attack_A") && amountBaseCombo == 2)
+        {
+            //If the 2nd animation is still playing and only 2 clicks has happend, return to idle
+            myAnim.SetInteger("basicComboCounter", 4);
+            canBaseAttack = true;
+            amountBaseCombo = 0;
+        }
+        else if (myAnim.GetCurrentAnimatorStateInfo(0).IsName("player_attack_A") && amountBaseCombo >= 3)
+        {
+            //If the 2nd animation is still playing and at least 3 clicks has happend, continue combo
+            myAnim.SetInteger("basicComboCounter", 3);
+            canBaseAttack = true;
+        }
+        //3rd attack
+        else if(myAnim.GetCurrentAnimatorStateInfo(0).IsName("player_attack_C"))
+        {
+            //The 3rd attack is the last in the combo, retun to idle
+            myAnim.SetInteger("basicComboCounter", 4);
+            canBaseAttack = true;
+            amountBaseCombo = 0;
+        }
+    }
 
     //Add on last keyframe of attack animations
     public void DisableMovement()
@@ -194,35 +228,5 @@ public class PlayerController : MonoBehaviour
     {
         canMove = true;
     }
-
-    public void EndCombo()
-    {
-        Debug.Log("PlayerController::EndCombo() -- Event called");
-
-        if (continueingCombo == false)
-        {
-            myAnim.SetBool("IsComboing", false);
-            canGetSecondBaseAttack = false;
-            canGetThirdBaseAttack = false;
-            canMove = true;
-        }
-        else
-        {
-            continueingCombo = false;
-        }
-
-    }
-
-    public void CanGetSecondBaseAttack()
-    {
-        myAnim.SetBool("IsComboing", true);
-        canGetSecondBaseAttack = true;
-    }
-
-    public void CanGetThirdBaseAttack()
-    {
-        myAnim.SetBool("IsComboing", true);
-        canGetThirdBaseAttack = true;
-    }
-
+    
 }
